@@ -5,12 +5,12 @@ import tkinter as tk
 from tkinter import messagebox, ttk, Toplevel
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-def tsp(cost, selected_nodes):
+def Multi_Destionation_Route(cost, selected_nodes):
     n = len(selected_nodes)
     dp = {}
     parent = {}
 
-    def dpTSP(mask, pos):
+    def dynamic_programming(mask, pos):
         if mask == (1 << n) - 1:
             return cost[selected_nodes[pos]][selected_nodes[0]]
         
@@ -23,7 +23,7 @@ def tsp(cost, selected_nodes):
         for i in range(n):
             if (mask & (1 << i)) == 0:
                 new_mask = mask | (1 << i)
-                temp_ans = cost[selected_nodes[pos]][selected_nodes[i]] + dpTSP(new_mask, i)
+                temp_ans = cost[selected_nodes[pos]][selected_nodes[i]] + dynamic_programming(new_mask, i)
                 
                 if temp_ans < ans:
                     ans = temp_ans
@@ -33,7 +33,7 @@ def tsp(cost, selected_nodes):
         parent[(mask, pos)] = best_next
         return ans
 
-    dpTSP(1, 0)
+    dynamic_programming(1, 0)
     
     path = [selected_nodes[0]]
     mask = 1
@@ -78,7 +78,7 @@ def visualize_graph(cost, path=None):
     
     return fig
 
-def process_tsp():
+def process_mdr():
     selected = entry_nodes.get().strip().split()
     selected = [node for node in selected if node in cost.keys()]
     
@@ -86,11 +86,11 @@ def process_tsp():
         messagebox.showwarning("Peringatan", "Masukkan minimal 2 node!")
         return
     
-    path, total_cost = tsp(cost, selected)
+    path, total_cost = Multi_Destionation_Route(cost, selected)
     result_label.config(text=f'Jalur Optimal: \n{" → ".join(path)}\nTotal Biaya: {total_cost}', fg='white')
     
     new_window = Toplevel(root)
-    new_window.title("Hasil TSP")
+    new_window.title("Hasil")
     new_window.geometry("500x450")
     
     fig = visualize_graph(cost, path)
@@ -120,7 +120,7 @@ tk.Label(left_frame, text="Masukkan Node yang Ingin Dikunjungi (dipisah mengguna
 entry_nodes = tk.Entry(left_frame, width=30)
 entry_nodes.pack()
 
-tk.Button(left_frame, text="OK", command=process_tsp).pack(pady=10)
+tk.Button(left_frame, text="OK", command=process_mdr).pack(pady=10)
 result_label = tk.Label(left_frame, text="", fg='white')
 result_label.pack()
 
